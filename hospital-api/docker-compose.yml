@@ -1,0 +1,26 @@
+version: '3'
+services:
+  # ... existing services ...
+
+  hospital-api:
+    build: ./hospital-api
+    ports:
+      - "3002:3002"
+    depends_on:
+      - redis
+    networks:
+      - dapr-network
+
+  hospital-api-dapr:
+    image: daprio/daprd:edge
+    command: ["./daprd",
+     "-app-id", "hospital-api",
+     "-app-port", "3002",
+     "-components-path", "/components"]
+    volumes:
+      - "./components/:/components"
+    depends_on:
+      - hospital-api
+    network_mode: "service:hospital-api"
+
+# ... existing networks ...
