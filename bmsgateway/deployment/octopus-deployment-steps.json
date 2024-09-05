@@ -1,0 +1,21 @@
+[
+  {
+    "Name": "Deploy BMS Gateway",
+    "ActionType": "Octopus.KubernetesDeployContainers",
+    "Properties": {
+      "Octopus.Action.KubernetesContainers.DeploymentStyle": "Deployment",
+      "Octopus.Action.KubernetesContainers.Namespace": "#{Octopus.Environment.Name | ToLower}",
+      "Octopus.Action.KubernetesContainers.DeploymentName": "bmsgateway",
+      "Octopus.Action.KubernetesContainers.DeploymentResourceType": "Deployment",
+      "Octopus.Action.KubernetesContainers.Replicas": "1",
+      "Octopus.Action.KubernetesContainers.PodSpec": "{\"containers\":[{\"name\":\"bmsgateway\",\"image\":\"#{Octopus.Action.Package[bmsgateway].Image}\",\"ports\":[{\"containerPort\":5000}],\"env\":[{\"name\":\"ASPNETCORE_ENVIRONMENT\",\"value\":\"#{Octopus.Environment.Name}\"}],\"resources\":{\"requests\":{\"cpu\":\"200m\",\"memory\":\"256Mi\"},\"limits\":{\"cpu\":\"500m\",\"memory\":\"512Mi\"}}}]}"
+    }
+  },
+  {
+    "Name": "Create BMS Gateway Service",
+    "ActionType": "Octopus.KubernetesDeployRawYaml",
+    "Properties": {
+      "Octopus.Action.KubernetesContainers.CustomResourceYaml": "apiVersion: v1\nkind: Service\nmetadata:\n  name: bmsgateway\nspec:\n  selector:\n    app: bmsgateway\n  ports:\n    - protocol: TCP\n      port: 80\n      targetPort: 5000\n  type: ClusterIP"
+    }
+  }
+]

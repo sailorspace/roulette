@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: your-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: your-app
+  template:
+    metadata:
+      labels:
+        app: your-app
+    spec:
+      containers:
+      - name: your-app
+        image: your-registry/your-app:v2.0.0  # Updated version
+        ports:
+        - containerPort: 8080
+        env:
+        - name: EXISTING_ENV_VAR
+          value: "existing-value"
+        - name: NEW_ENV_VAR  # New environment variable
+          value: "new-value"

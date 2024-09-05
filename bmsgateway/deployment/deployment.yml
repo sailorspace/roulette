@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bmsgateway
+  labels:
+    app: bmsgateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bmsgateway
+  template:
+    metadata:
+      labels:
+        app: bmsgateway
+    spec:
+      containers:
+      - name: bmsgateway
+        image: your-registry/bmsgateway:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bmsgateway
+spec:
+  selector:
+    app: bmsgateway
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

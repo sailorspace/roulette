@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weathermvcfront
+  labels:
+    app: weathermvcfront
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weathermvcfront
+  template:
+    metadata:
+      labels:
+        app: weathermvcfront
+    spec:
+      containers:
+      - name: weathermvcfront
+        image: your-registry/weathermvcfront:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weathermvcfront
+spec:
+  selector:
+    app: weathermvcfront
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
