@@ -1,0 +1,28 @@
+# Use the official .NET SDK image as a build stage
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+
+# Copy csproj and restore dependencies
+COPY ["WeatherMvcFront.csproj", "./"]
+RUN dotnet restore
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the application
+RUN dotnet build -c Release -o /app/build
+
+# Publish the application
+FROM build AS publish
+RUN dotnet publish -c Release -o /app/publish
+
+# Final stage: Use the ASP.NET runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+# Expose the port the app will run on
+EXPOSE 80
+
+# Start the application
+ENTRYPOINT ["dotnet", "WeatherMvcFront.dll"]
